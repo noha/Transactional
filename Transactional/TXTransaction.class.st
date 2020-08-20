@@ -31,11 +31,10 @@ TXTransaction >> do: aBlock [
 	TXCurrentTransaction 
 		value: self
 		during: [
-			[ aBlock value ]
-				on: Error do: [:error | 
-					self abort: error.
-					^ self ].
-			self commit ].
+			[  aBlock value.
+				self commit  ]
+					on: Error do: [:error | 
+						self abort: error ] ]
 ]
 
 { #category : #initialization }
