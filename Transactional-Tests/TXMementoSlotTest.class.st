@@ -11,8 +11,7 @@ TXMementoSlotTest >> createClass [
 	
 	aClass := self make: [ :builder | 
 		builder 
-			slots: {mementoSlot}
-		].
+			slots: {mementoSlot} ]
 
 ]
 
@@ -26,14 +25,14 @@ TXMementoSlotTest >> forkWithTransaction: aBlock [
 
 { #category : #running }
 TXMementoSlotTest >> setUp [ 
+	super setUp.
 	self createClass
 ]
 
 { #category : #tests }
 TXMementoSlotTest >> testConcurrentWriteCollection [
-	"Add instance variables using the builder interface"
-	
 	| object semaphore1 semaphore2 mementoSlot |
+	
 	mementoSlot := aClass slotNamed: #memento2.
 	object := aClass new.
 	mementoSlot write: #(1 2 3 4 5 6) asOrderedCollection to: object.
@@ -62,38 +61,9 @@ TXMementoSlotTest >> testConcurrentWriteCollection [
 ]
 
 { #category : #tests }
-TXMementoSlotTest >> testConcurrentWriteNoTransaction [
-	"Add instance variables using the builder interface"
-	
+TXMementoSlotTest >> testConcurrentWriteObject [	
 	| object semaphore1 semaphore2 mementoSlot |
-	mementoSlot := aClass slotNamed: #memento2.
-	object := aClass new.
-	semaphore1 := Semaphore new.
-	semaphore2 := Semaphore new.
 	
-	[ 
-		self assert: (mementoSlot read: object) equals: nil.
-		mementoSlot write: #process1 to: object.
-		semaphore1 wait.
-		self assert: (mementoSlot read: object) equals: #process1 ] fork.
-	
-	[ 
-		self assert: (mementoSlot read: object) equals: nil.
-		mementoSlot write: #process2 to: object.
-		semaphore2 wait.
-		self assert: (mementoSlot read: object) equals: #process2 ] fork.
-	
-	self assert: (mementoSlot read: object) equals: nil.
-	semaphore2 signal.
-	semaphore1 signal.
-	
-]
-
-{ #category : #tests }
-TXMementoSlotTest >> testConcurrentWriteObject [
-	"Add instance variables using the builder interface"
-	
-	| object semaphore1 semaphore2 mementoSlot |
 	mementoSlot := aClass slotNamed: #memento2.
 	object := aClass new. 
 	semaphore1 := Semaphore new.
@@ -119,8 +89,8 @@ TXMementoSlotTest >> testConcurrentWriteObject [
 
 { #category : #tests }
 TXMementoSlotTest >> testCreateClassWithMementoSlot [
-	
 	| mementoSlot |
+	
 	mementoSlot := aClass slotNamed: #memento2.
 
 	self assert: (aClass hasSlot: mementoSlot).
@@ -131,9 +101,8 @@ TXMementoSlotTest >> testCreateClassWithMementoSlot [
 
 { #category : #tests }
 TXMementoSlotTest >> testCreateClassWithNilMemento [
-	"Add instance variables using the builder interface"
-	
 	| value mementoSlot |
+	
 	mementoSlot := aClass slotNamed: #memento2.
 	
 	value := mementoSlot read: aClass new.
@@ -143,9 +112,8 @@ TXMementoSlotTest >> testCreateClassWithNilMemento [
 
 { #category : #tests }
 TXMementoSlotTest >> testCreateClassWithValueWrite [
-	"Add instance variables using the builder interface"
-	
 	| object mementoSlot |
+
 	mementoSlot := aClass slotNamed: #memento2.
 	
 	object := aClass new.
@@ -156,9 +124,8 @@ TXMementoSlotTest >> testCreateClassWithValueWrite [
 
 { #category : #tests }
 TXMementoSlotTest >> testCreateClassWithValueWriteInProcess [
-	"Add instance variables using the builder interface"
-	
 	| object semaphore mementoSlot |
+	
 	mementoSlot := aClass slotNamed: #memento2.
 	
 	object := aClass new.
