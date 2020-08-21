@@ -9,7 +9,13 @@ Class {
 
 { #category : #testing }
 TXMementoSlot >> hasChanged: anObject [
-	^ ((self read: anObject) = (self readOriginal: anObject)) not
+	| old new |
+	old := self read: anObject.
+	Transcript show: 'has changed, old=', old asString; cr.
+	new := self readOriginal: anObject.
+	Transcript show: 'has changed, new=', new asString; cr.
+
+	^ (new = old) not
 ]
 
 { #category : #'class building' }
@@ -30,6 +36,7 @@ TXMementoSlot >> read: anObject [
 	| slotValue |
 	^ TXTransaction current 
 		ifNotNil: [ :transaction |
+			Transcript show: 'transaction in place on read ', self name, ' from ', anObject asString; cr.
 			slotValue := memento read: anObject.
 			slotValue 
 				ifNotNil: [ slotValue ]
@@ -40,7 +47,9 @@ TXMementoSlot >> read: anObject [
 							value := value copy.
 							memento write: value to: anObject ].
 					value ] ]
-		ifNil: [ self readOriginal: anObject ]
+		ifNil: [ 
+			Transcript show: 'transaction NOT in place on read ', self name, ' from ', anObject asString; cr.
+			self readOriginal: anObject ]
 ]
 
 { #category : #'meta-object-protocol' }
@@ -53,11 +62,15 @@ TXMementoSlot >> readOriginal: anObject [
 TXMementoSlot >> write: aValue to: anObject [
 	TXTransaction current
 		ifNotNil: [ :transaction | | oldValue |
+			Transcript show: 'transaction in place when writing ', aValue asString, ' to ', anObject asString; cr.
 			oldValue := memento read: anObject.
+			Transcript show: 'old value = ', oldValue asString;cr.
 			memento write: aValue to: anObject.
+			Transcript show: 'new value = ', aValue asString;cr.
 			oldValue ifNil: [
 				transaction register: anObject ]]
 		ifNil: [ 
+			Transcript show: 'transaction NOT in place when writing ', aValue asString, ' to ', anObject asString; cr.
 			anObject 
 				instVarAt: (anObject class instVarNames indexOf: self name)
 				put: aValue ]
