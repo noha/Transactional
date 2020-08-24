@@ -50,12 +50,6 @@ TXMementoSlot >> hasChanged: anObject [
 	^ (new = old) not
 ]
 
-{ #category : #initialization }
-TXMementoSlot >> initialize: anObject [.
-	super initialize: anObject.
-	self write: TXNoValue to: anObject
-]
-
 { #category : #'meta-object-protocol' }
 TXMementoSlot >> instVarIndexIn: anObject [
 	

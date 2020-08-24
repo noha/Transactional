@@ -11,7 +11,7 @@ TXMementoSlotTest >> createClass [
 	
 	aClass := self make: [ :builder | 
 		builder 
-			slots: {mementoSlot} ]
+			slots: { mementoSlot } ]
 
 ]
 
@@ -36,7 +36,7 @@ TXMementoSlotTest >> testConcurrentWriteCollection [
 	mementoSlot := aClass slotNamed: #memento2.
 	object := aClass new.
 	mementoSlot write: #(1 2 3 4 5 6) asOrderedCollection to: object.
-	
+	self assert: (mementoSlot read: object) equals: #(1 2 3 4 5 6) asOrderedCollection.
 	semaphore1 := Semaphore new.
 	semaphore2 := Semaphore new.
 	
@@ -47,7 +47,6 @@ TXMementoSlotTest >> testConcurrentWriteCollection [
 		(mementoSlot read: object) removeAt: 3.
 		semaphore1 wait.
 		self assert: (mementoSlot read: object) equals: #(1 2 4 5 6) asOrderedCollection ].
-	
 	self forkWithTransaction: [   
 		self assert: (mementoSlot read: object) equals: #(1 2 3 4 5 6) asOrderedCollection.
 		(mementoSlot read: object) add: 7.
@@ -81,7 +80,7 @@ TXMementoSlotTest >> testConcurrentWriteObject [
 		semaphore2 wait.
 		self assert: (mementoSlot read: object) equals: #process2 ].
 	
-	self assert: (mementoSlot read: object) equals: TXNoValue.
+	self assert: (mementoSlot read: object) equals: nil.
 	semaphore2 signal.
 	100 milliSeconds wait.
 	semaphore1 signal. 
@@ -106,7 +105,7 @@ TXMementoSlotTest >> testCreateClassWithNilMemento [
 	mementoSlot := aClass slotNamed: #memento2.
 	
 	value := mementoSlot read: aClass new.
-	self assert: value equals: TXNoValue 
+	self assert: value equals: nil 
 
 ]
 

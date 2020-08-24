@@ -4,6 +4,11 @@ Class {
 	#category : #'Transactional-Core'
 }
 
+{ #category : #initialization }
+TXProcessLocalSlot >> initialize: anObject [
+	thisContext object: anObject instVarAt: index put: TXProcessLocalVariable new
+]
+
 { #category : #testing }
 TXProcessLocalSlot >> isVisible [ 
 	^ true
