@@ -6,5 +6,5 @@ Class {
 
 { #category : #testing }
 TXProcessLocalSlot >> isVisible [ 
-	^ false
+	^ true
 ]
