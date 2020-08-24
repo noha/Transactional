@@ -81,7 +81,7 @@ TXMementoSlotTest >> testConcurrentWriteObject [
 		semaphore2 wait.
 		self assert: (mementoSlot read: object) equals: #process2 ].
 	
-	self assert: (mementoSlot read: object) equals: nil.
+	self assert: (mementoSlot read: object) equals: TXNoValue.
 	semaphore2 signal.
 	100 milliSeconds wait.
 	semaphore1 signal. 
@@ -106,7 +106,7 @@ TXMementoSlotTest >> testCreateClassWithNilMemento [
 	mementoSlot := aClass slotNamed: #memento2.
 	
 	value := mementoSlot read: aClass new.
-	self assert: value equals: nil
+	self assert: value equals: TXNoValue 
 
 ]
 
