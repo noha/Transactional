@@ -39,7 +39,7 @@ TXMementoSlot >> installingIn: aClass [
 	aClass classLayout 
 		resolveSlot: slotName   
 		ifFound:  [: slot |  memento := slot ]
-		ifNone: [aClass addSlot: (memento := slotName => ProcessLocalSlot)]
+		ifNone: [aClass addSlot: (memento := slotName => TXProcessLocalSlot)]
 	
 ]
 
