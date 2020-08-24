@@ -6,7 +6,7 @@ Class {
 		'newValue',
 		'property'
 	],
-	#category : #'Transactional-Core-Transactional-Core'
+	#category : #'Transactional-Core'
 }
 
 { #category : #accessing }

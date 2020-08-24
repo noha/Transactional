@@ -5,7 +5,7 @@ Class {
 		'commitBlock',
 		'abortBlock'
 	],
-	#category : #'Transactional-Core-Transactional-Core'
+	#category : #'Transactional-Core'
 }
 
 { #category : #accessing }
@@ -42,7 +42,7 @@ TXPluggableTransaction >> journalFor: anObject [
 			list add: (TXPropertyChange new
 				object: anObject;
 				property: slot name;
-				oldValue: (slot readOriginal: anObject);
+				oldValue: (slot basicRead: anObject);
 				newValue: (slot read: anObject) )] ].
 	^ list
 ]

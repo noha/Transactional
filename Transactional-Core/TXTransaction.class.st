@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'dirtyObjects'
 	],
-	#category : #'Transactional-Core-Transactional-Core'
+	#category : #'Transactional-Core'
 }
 
 { #category : #'as yet unclassified' }

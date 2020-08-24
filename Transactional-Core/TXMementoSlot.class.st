@@ -4,30 +4,62 @@ Class {
 	#instVars : [
 		'memento'
 	],
-	#category : #'Transactional-Core-Transactional-Core'
+	#category : #'Transactional-Core'
 }
 
 { #category : #'as yet unclassified' }
 TXMementoSlot >> abort: anObject [
-	memento write: nil to: anObject 
+	memento write: TXNoValue to: anObject 
+]
+
+{ #category : #'meta-object-protocol' }
+TXMementoSlot >> basicRead: anObject [
+
+	^ anObject instVarAt: (self instVarIndexIn: anObject)
+]
+
+{ #category : #'meta-object-protocol' }
+TXMementoSlot >> basicWrite: aValue to: anObject [
+	
+	anObject 
+		instVarAt: (self instVarIndexIn: anObject)
+		put: aValue
 ]
 
 { #category : #'as yet unclassified' }
 TXMementoSlot >> commit: anObject [
-	anObject 
-		instVarAt: (anObject class instVarNames indexOf: self name)
-		put: (self read: anObject)
+	self 
+		basicWrite: (self read: anObject)  
+		to: anObject 
+		
+]
+
+{ #category : #'meta-object-protocol' }
+TXMementoSlot >> doWithTransaction: aTransactionBlock ifNone: aBlock [
+	^ TXTransaction current
+		ifNotNil: aTransactionBlock 
+		ifNil: aBlock
 ]
 
 { #category : #testing }
 TXMementoSlot >> hasChanged: anObject [
 	| old new |
 	old := self read: anObject.
-	Transcript show: 'has changed, old=', old asString; cr.
-	new := self readOriginal: anObject.
-	Transcript show: 'has changed, new=', new asString; cr.
+	new := self basicRead: anObject.
 
 	^ (new = old) not
+]
+
+{ #category : #initialization }
+TXMementoSlot >> initialize: anObject [.
+	super initialize: anObject.
+	self write: TXNoValue to: anObject
+]
+
+{ #category : #'meta-object-protocol' }
+TXMementoSlot >> instVarIndexIn: anObject [
+	
+	^ anObject class instVarNames indexOf: self name
 ]
 
 { #category : #'class building' }
@@ -38,48 +70,43 @@ TXMementoSlot >> installingIn: aClass [
 	slotName := ('_mementoSlot_', self name) asSymbol.
 	aClass classLayout 
 		resolveSlot: slotName   
-		ifFound:  [: slot |  memento := slot ]
+		ifFound:  [: slot | memento := slot ]
 		ifNone: [aClass addSlot: (memento := slotName => TXProcessLocalSlot)]
 	
 ]
 
 { #category : #'meta-object-protocol' }
 TXMementoSlot >> read: anObject [
-	| slotValue |
-	^ TXTransaction current 
-		ifNotNil: [ :transaction |
-			Transcript show: 'transaction in place on read ', self name, ' from ', anObject asString; cr.
-			slotValue := memento read: anObject.
-			slotValue 
-				ifNotNil: [ slotValue ]
-				ifNil: [ | value |
-					value := self readOriginal: anObject.
+	
+	^ self 
+		doWithTransaction: [ :transaction | | mementoValue |
+			mementoValue := memento read: anObject.
+			(mementoValue = TXNoValue) 
+				ifTrue: [ | value |
+					value := self basicRead: anObject.
 					value isCollection 
 						ifTrue: [ 
 							value := value copy.
-							memento write: value to: anObject ].
-					value ] ]
-		ifNil: [ 
-			Transcript show: 'transaction NOT in place on read ', self name, ' from ', anObject asString; cr.
-			self readOriginal: anObject ]
+							memento write: value to: anObject.
+							transaction register: anObject].
+					value ]
+				ifFalse: [ mementoValue ] ]
+		ifNone:  [ 
+			self basicRead: anObject ]
 ]
 
 { #category : #'meta-object-protocol' }
-TXMementoSlot >> readOriginal: anObject [
-
-	^ anObject instVarAt: (anObject class instVarNames indexOf: self name)
+TXMementoSlot >> wantsInitialization [ 
+	^ true
 ]
 
 { #category : #'meta-object-protocol' }
 TXMementoSlot >> write: aValue to: anObject [
-	TXTransaction current
-		ifNotNil: [ :transaction | | oldValue |
-			oldValue := memento read: anObject.
-			memento write: aValue to: anObject.
-			oldValue ifNil: [
-				transaction register: anObject ]]
-		ifNil: [ 
-			anObject 
-				instVarAt: (anObject class instVarNames indexOf: self name)
-				put: aValue ]
+	self 
+		doWithTransaction: [ :transaction |
+			((memento read: anObject) = TXNoValue) 
+				ifTrue: [ transaction register: anObject ] .
+			memento write: aValue to: anObject ]
+		ifNone: [ 
+			self basicWrite: aValue to: anObject   ]
 ]
