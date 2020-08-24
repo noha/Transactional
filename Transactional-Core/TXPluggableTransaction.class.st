@@ -20,12 +20,12 @@ TXPluggableTransaction >> abort: error [
 { #category : #accessing }
 TXPluggableTransaction >> commit [ 
 	super commit.
-	commitBlock cull: dirty cull: self
+	commitBlock cull: dirtyObjects cull: self
 ]
 
 { #category : #'as yet unclassified' }
 TXPluggableTransaction >> journal [
-	^ dirty 
+	^ dirtyObjects 
 		flatCollect: [ :each | self journalFor: each ]
 		as: OrderedCollection 
 ]
@@ -40,7 +40,8 @@ TXPluggableTransaction >> journalFor: anObject [
 	(anObject class slots reject: [ :each | each name beginsWith: '_' ]) do: [ :slot |
 		(slot hasChanged: anObject) ifTrue: [ 
 			list add: (TXPropertyChange new
-				name: slot name;
+				object: anObject;
+				property: slot name;
 				oldValue: (slot readOriginal: anObject);
 				newValue: (slot read: anObject) )] ].
 	^ list

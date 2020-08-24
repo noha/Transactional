@@ -1,18 +1,10 @@
 Class {
 	#name : #TXObjectCreated,
-	#superclass : #Object,
-	#instVars : [
-		'object'
-	],
+	#superclass : #TXModification,
 	#category : #'Transactional-Core'
 }
 
-{ #category : #accessing }
-TXObjectCreated >> object [
-	^ object
-]
-
-{ #category : #accessing }
-TXObjectCreated >> object: anObject [
-	object := anObject
+{ #category : #printing }
+TXObjectCreated >> printOn: aStream [
+	aStream << 'created : ' << object class name 
 ]

@@ -2,7 +2,7 @@ Class {
 	#name : #TXTransaction,
 	#superclass : #Object,
 	#instVars : [
-		'dirty'
+		'dirtyObjects'
 	],
 	#category : #'Transactional-Core-Transactional-Core'
 }
@@ -14,16 +14,14 @@ TXTransaction class >> current [
 
 { #category : #accessing }
 TXTransaction >> abort: error [
-	Transcript show: '---abort: ', error messageText, '---'; cr.
-	dirty do: [ :each |
-		Transcript show: each asString; cr ]
+	dirtyObjects do: [ :each |
+		each transactionalAbort ]
 ]
 
 { #category : #accessing }
 TXTransaction >> commit [ 
-	Transcript show: '---commit---'; cr.
-	dirty do: [ :each |
-		Transcript show: each asString; cr ]
+	dirtyObjects do: [ :each |
+		each transactionalCommit ]
 ]
 
 { #category : #enumerating }
@@ -40,10 +38,11 @@ TXTransaction >> do: aBlock [
 { #category : #initialization }
 TXTransaction >> initialize [ 
 	super initialize.
-	dirty := Set new
+	dirtyObjects := OrderedCollection new
 ]
 
 { #category : #accessing }
 TXTransaction >> register: anObject [ 
-	dirty add: anObject
+	(dirtyObjects includes: anObject) ifFalse: [ 
+		dirtyObjects add: anObject ]
 ]

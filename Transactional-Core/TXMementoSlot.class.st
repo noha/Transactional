@@ -7,6 +7,18 @@ Class {
 	#category : #'Transactional-Core-Transactional-Core'
 }
 
+{ #category : #'as yet unclassified' }
+TXMementoSlot >> abort: anObject [
+	memento write: nil to: anObject 
+]
+
+{ #category : #'as yet unclassified' }
+TXMementoSlot >> commit: anObject [
+	anObject 
+		instVarAt: (anObject class instVarNames indexOf: self name)
+		put: (self read: anObject)
+]
+
 { #category : #testing }
 TXMementoSlot >> hasChanged: anObject [
 	| old new |
@@ -62,15 +74,11 @@ TXMementoSlot >> readOriginal: anObject [
 TXMementoSlot >> write: aValue to: anObject [
 	TXTransaction current
 		ifNotNil: [ :transaction | | oldValue |
-			Transcript show: 'transaction in place when writing ', aValue asString, ' to ', anObject asString; cr.
 			oldValue := memento read: anObject.
-			Transcript show: 'old value = ', oldValue asString;cr.
 			memento write: aValue to: anObject.
-			Transcript show: 'new value = ', aValue asString;cr.
 			oldValue ifNil: [
 				transaction register: anObject ]]
 		ifNil: [ 
-			Transcript show: 'transaction NOT in place when writing ', aValue asString, ' to ', anObject asString; cr.
 			anObject 
 				instVarAt: (anObject class instVarNames indexOf: self name)
 				put: aValue ]

@@ -1,23 +1,13 @@
 Class {
 	#name : #TXPropertyChange,
-	#superclass : #Object,
+	#superclass : #TXModification,
 	#instVars : [
-		'name',
 		'oldValue',
-		'newValue'
+		'newValue',
+		'property'
 	],
 	#category : #'Transactional-Core-Transactional-Core'
 }
-
-{ #category : #accessing }
-TXPropertyChange >> name [
-	^ name
-]
-
-{ #category : #accessing }
-TXPropertyChange >> name: anObject [
-	name := anObject
-]
 
 { #category : #accessing }
 TXPropertyChange >> newValue [
@@ -37,4 +27,19 @@ TXPropertyChange >> oldValue [
 { #category : #accessing }
 TXPropertyChange >> oldValue: anObject [
 	oldValue := anObject
+]
+
+{ #category : #printing }
+TXPropertyChange >> printOn: aStream [
+	aStream << 'changed: ' << object class name << ' oldValue=' << oldValue asString << ', newValue=' << newValue asString
+]
+
+{ #category : #accessing }
+TXPropertyChange >> property [
+	^ property
+]
+
+{ #category : #accessing }
+TXPropertyChange >> property: anObject [
+	property := anObject
 ]
