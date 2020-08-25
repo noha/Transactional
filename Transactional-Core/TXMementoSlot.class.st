@@ -9,18 +9,16 @@ Class {
 
 { #category : #'as yet unclassified' }
 TXMementoSlot >> abort: anObject [
-	memento write: TXNoValue to: anObject 
+	memento write: TXNoValue to: anObject
 ]
 
 { #category : #'meta-object-protocol' }
 TXMementoSlot >> basicRead: anObject [
-
 	^ anObject instVarAt: (self instVarIndexIn: anObject)
 ]
 
 { #category : #'meta-object-protocol' }
 TXMementoSlot >> basicWrite: aValue to: anObject [
-	
 	anObject 
 		instVarAt: (self instVarIndexIn: anObject)
 		put: aValue
@@ -52,7 +50,6 @@ TXMementoSlot >> hasChanged: anObject [
 
 { #category : #'meta-object-protocol' }
 TXMementoSlot >> instVarIndexIn: anObject [
-	
 	^ anObject class instVarNames indexOf: self name
 ]
 
@@ -75,7 +72,11 @@ TXMementoSlot >> read: anObject [
 	^ self 
 		doWithTransaction: [ :transaction | | mementoValue |
 			mementoValue := memento read: anObject.
-			(mementoValue = TXNoValue) 
+			Transcript show: self name asString, ': '.
+			Transcript show: 'read proc: ', Processor activeProcess identityHash asString; show: ', '.
+			Transcript show: 'object: ', anObject asString; show: ', '.
+			Transcript show: 'value: ', mementoValue asString; cr.
+			(mementoValue == TXNoValue) 
 				ifTrue: [ | value |
 					value := self basicRead: anObject.
 					value isCollection 
@@ -86,6 +87,10 @@ TXMementoSlot >> read: anObject [
 					value ]
 				ifFalse: [ mementoValue ] ]
 		ifNone:  [ 
+			Transcript show: self name asString, ': '.
+			Transcript show: 'read proc: ', Processor activeProcess identityHash asString; show: ', '.
+			Transcript show: 'object: ', anObject asString; show: ', '.
+			Transcript show: 'basic read'; cr.
 			self basicRead: anObject ]
 ]
 
@@ -98,9 +103,19 @@ TXMementoSlot >> wantsInitialization [
 TXMementoSlot >> write: aValue to: anObject [
 	self 
 		doWithTransaction: [ :transaction |
+			Transcript show: self name asString, ': '.
+			Transcript show: 'write proc: ', Processor activeProcess identityHash asString; show: ', '.
+			Transcript show: 'object: ', anObject asString; show: ', '.
+			Transcript show: 'current: ', (memento read: anObject) asString; show: ', '.
+			Transcript show: 'value: ', aValue asString; cr.
+
 			((memento read: anObject) = TXNoValue) 
 				ifTrue: [ transaction register: anObject ] .
 			memento write: aValue to: anObject ]
 		ifNone: [ 
+			Transcript show: self name asString, ': '.
+			Transcript show: 'write proc: ', Processor activeProcess identityHash asString; show: ', '.
+			Transcript show: 'object: ', anObject asString; show: ', '.
+			Transcript show: 'value: ', aValue asString; cr.
 			self basicWrite: aValue to: anObject   ]
 ]

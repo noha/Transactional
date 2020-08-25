@@ -7,12 +7,13 @@ Class {
 { #category : #running }
 TXMementoSlotTest >> createClass [
 	| mementoSlot |
+	Transcript show: '// create class'; cr.
 	mementoSlot := #memento2 => TXMementoSlot.
-	
+	Transcript show: '- after slot'; cr.
 	aClass := self make: [ :builder | 
 		builder 
-			slots: { mementoSlot } ]
-
+			slots: { mementoSlot } ].
+	Transcript show: '\\ create class'; cr.
 ]
 
 { #category : #tests }
@@ -25,34 +26,61 @@ TXMementoSlotTest >> forkWithTransaction: aBlock [
 
 { #category : #running }
 TXMementoSlotTest >> setUp [ 
+	Transcript show: '// setUp'; cr.
 	super setUp.
-	self createClass
+	self createClass.
+	Transcript show: '\\ setUp'; cr.
+]
+
+{ #category : #running }
+TXMementoSlotTest >> tearDown [ 
+	aClass := nil.
 ]
 
 { #category : #tests }
 TXMementoSlotTest >> testConcurrentWriteCollection [
 	| object semaphore1 semaphore2 mementoSlot |
-	
+	object transactionalAbort .
 	mementoSlot := aClass slotNamed: #memento2.
 	object := aClass new.
-	mementoSlot write: #(1 2 3 4 5 6) asOrderedCollection to: object.
+	object transactionalAbort .
+	Transcript show: '-- UI --'; cr.
+	Transcript show: 'UI before process: ', Processor activeProcess identityHash asString; cr.
+	mementoSlot write: #(1 2 3 4 5 6) asOrderedCollection to: object.	
 	self assert: (mementoSlot read: object) equals: #(1 2 3 4 5 6) asOrderedCollection.
+	Transcript show: '// UI --'; cr.
 	semaphore1 := Semaphore new.
 	semaphore2 := Semaphore new.
 	
 	
 
 	self forkWithTransaction: [  
+		Transcript show: '-- #1 --'; cr.
+		Transcript show: '#1 before process: ', Processor activeProcess identityHash asString; cr.
 		self assert: (mementoSlot read: object) equals: #(1 2 3 4 5 6) asOrderedCollection.
 		(mementoSlot read: object) removeAt: 3.
+		Transcript show: '// #1 --'; cr.
 		semaphore1 wait.
-		self assert: (mementoSlot read: object) equals: #(1 2 4 5 6) asOrderedCollection ].
-	self forkWithTransaction: [   
+		Transcript show: '-- #1 --'; cr.
+		Transcript show: '#1 after process: ', Processor activeProcess identityHash asString; cr.
+		self assert: (mementoSlot read: object) equals: #(1 2 4 5 6) asOrderedCollection.
+		Transcript show: '// #1 --'; cr. ].
+		
+
+	self forkWithTransaction: [  
+		Transcript show: '-- #2 --'; cr.
 		self assert: (mementoSlot read: object) equals: #(1 2 3 4 5 6) asOrderedCollection.
+		Transcript show: '#2 before process: ', Processor activeProcess identityHash asString; cr.
 		(mementoSlot read: object) add: 7.
+		Transcript show: '// #2 --'; cr.
 		semaphore2 wait.
-		self assert: (mementoSlot read: object) equals: #(1 2 3 4 5 6 7) asOrderedCollection ].
+		Transcript show: '-- #2 --'; cr.
+		Transcript show: '#2 after process: ', Processor activeProcess identityHash asString; cr.
+		self assert: (mementoSlot read: object) equals: #(1 2 3 4 5 6 7) asOrderedCollection.
+		Transcript show: '// #2 --'; cr.
+ ].
 	
+	Transcript show: 'UI after process: ', Processor activeProcess identityHash asString; cr.
 	self assert: (mementoSlot read: object) equals: #(1 2 3 4 5 6) asOrderedCollection.
 	semaphore2 signal.
 	100 milliSeconds wait.
