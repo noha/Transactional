@@ -39,7 +39,7 @@ TXJournalTest >> testBuildJournal [
 			self assert: list size = 1.
 			journal := tx journalFor: list anyOne.
 			self assert: journal size equals: 3 ];
-		onAbortDo: [:error | self halt ].
+		onAbortDo: [:error | error pass ].
 		
 	object := aClass new.
 	transaction do: [ 

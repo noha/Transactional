@@ -8,3 +8,8 @@ Class {
 TXProcessLocalVariable >> default [ 
 	^ TXNoValue 
 ]
+
+{ #category : #initialization }
+TXProcessLocalVariable >> reset: anObject [
+	^ Processor activeProcess resetPSValueAt: index 
+]

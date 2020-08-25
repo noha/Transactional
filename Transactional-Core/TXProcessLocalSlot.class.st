@@ -13,3 +13,8 @@ TXProcessLocalSlot >> initialize: anObject [
 TXProcessLocalSlot >> isVisible [ 
 	^ true
 ]
+
+{ #category : #accessing }
+TXProcessLocalSlot >> reset: anObject [
+	(thisContext object: anObject instVarAt: index) reset: anObject
+]

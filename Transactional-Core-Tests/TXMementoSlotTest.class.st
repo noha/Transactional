@@ -40,47 +40,29 @@ TXMementoSlotTest >> tearDown [
 { #category : #tests }
 TXMementoSlotTest >> testConcurrentWriteCollection [
 	| object semaphore1 semaphore2 mementoSlot |
-	object transactionalAbort .
 	mementoSlot := aClass slotNamed: #memento2.
+	
 	object := aClass new.
-	object transactionalAbort .
-	Transcript show: '-- UI --'; cr.
-	Transcript show: 'UI before process: ', Processor activeProcess identityHash asString; cr.
 	mementoSlot write: #(1 2 3 4 5 6) asOrderedCollection to: object.	
 	self assert: (mementoSlot read: object) equals: #(1 2 3 4 5 6) asOrderedCollection.
-	Transcript show: '// UI --'; cr.
+	
 	semaphore1 := Semaphore new.
 	semaphore2 := Semaphore new.
 	
-	
-
 	self forkWithTransaction: [  
-		Transcript show: '-- #1 --'; cr.
-		Transcript show: '#1 before process: ', Processor activeProcess identityHash asString; cr.
 		self assert: (mementoSlot read: object) equals: #(1 2 3 4 5 6) asOrderedCollection.
 		(mementoSlot read: object) removeAt: 3.
-		Transcript show: '// #1 --'; cr.
 		semaphore1 wait.
-		Transcript show: '-- #1 --'; cr.
-		Transcript show: '#1 after process: ', Processor activeProcess identityHash asString; cr.
-		self assert: (mementoSlot read: object) equals: #(1 2 4 5 6) asOrderedCollection.
-		Transcript show: '// #1 --'; cr. ].
+		self assert: (mementoSlot read: object) equals: #(1 2 4 5 6) asOrderedCollection ].
 		
 
 	self forkWithTransaction: [  
-		Transcript show: '-- #2 --'; cr.
 		self assert: (mementoSlot read: object) equals: #(1 2 3 4 5 6) asOrderedCollection.
-		Transcript show: '#2 before process: ', Processor activeProcess identityHash asString; cr.
 		(mementoSlot read: object) add: 7.
-		Transcript show: '// #2 --'; cr.
 		semaphore2 wait.
-		Transcript show: '-- #2 --'; cr.
-		Transcript show: '#2 after process: ', Processor activeProcess identityHash asString; cr.
 		self assert: (mementoSlot read: object) equals: #(1 2 3 4 5 6 7) asOrderedCollection.
-		Transcript show: '// #2 --'; cr.
  ].
 	
-	Transcript show: 'UI after process: ', Processor activeProcess identityHash asString; cr.
 	self assert: (mementoSlot read: object) equals: #(1 2 3 4 5 6) asOrderedCollection.
 	semaphore2 signal.
 	100 milliSeconds wait.
@@ -127,29 +109,6 @@ TXMementoSlotTest >> testCreateClassWithMementoSlot [
 ]
 
 { #category : #tests }
-TXMementoSlotTest >> testCreateClassWithNilMemento [
-	| value mementoSlot |
-	
-	mementoSlot := aClass slotNamed: #memento2.
-	
-	value := mementoSlot read: aClass new.
-	self assert: value equals: nil 
-
-]
-
-{ #category : #tests }
-TXMementoSlotTest >> testCreateClassWithValueWrite [
-	| object mementoSlot |
-
-	mementoSlot := aClass slotNamed: #memento2.
-	
-	object := aClass new.
-	mementoSlot write: #foo to: object.
-	self assert: (mementoSlot read: object) equals: #foo
-
-]
-
-{ #category : #tests }
 TXMementoSlotTest >> testCreateClassWithValueWriteInProcess [
 	| object semaphore mementoSlot |
 	
@@ -166,9 +125,64 @@ TXMementoSlotTest >> testCreateClassWithValueWriteInProcess [
 ]
 
 { #category : #tests }
+TXMementoSlotTest >> testReadNilAfterCreation [
+	| value mementoSlot |
+	
+	mementoSlot := aClass slotNamed: #memento2.
+	
+	value := mementoSlot read: aClass new.
+	self assert: value equals: nil 
+
+]
+
+{ #category : #tests }
 TXMementoSlotTest >> testSetTransaction [
 	
 	TXCurrentTransaction 
 		value: TXTransaction new 
 		during: [  self assert: TXTransaction current notNil ]
+]
+
+{ #category : #tests }
+TXMementoSlotTest >> testWriteNilValueInBackground [
+	| object mementoSlot semaphore value |
+
+	mementoSlot := aClass slotNamed: #memento2.
+	
+	semaphore := Semaphore new.
+	object := aClass new.
+	[ mementoSlot write: nil to: object.
+	  value := mementoSlot read: object.
+		semaphore signal ] fork.
+	semaphore wait.
+	self assert: value equals: nil
+
+]
+
+{ #category : #tests }
+TXMementoSlotTest >> testWriteValueInBackground [
+	| object mementoSlot semaphore value |
+
+	mementoSlot := aClass slotNamed: #memento2.
+	
+	semaphore := Semaphore new.
+	object := aClass new.
+	[ mementoSlot write: #foo to: object.
+	  value := mementoSlot read: object.
+		semaphore signal ] fork.
+	semaphore wait.
+	self assert: value equals: #foo
+
+]
+
+{ #category : #tests }
+TXMementoSlotTest >> testWritingInUIThread [
+	| object mementoSlot |
+
+	mementoSlot := aClass slotNamed: #memento2.
+	
+	object := aClass new.
+	mementoSlot write: #foo to: object.
+	self assert: (mementoSlot read: object) equals: #foo
+
 ]

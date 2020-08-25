@@ -9,7 +9,7 @@ Class {
 
 { #category : #'as yet unclassified' }
 TXMementoSlot >> abort: anObject [
-	memento write: TXNoValue to: anObject
+	memento reset: anObject
 ]
 
 { #category : #'meta-object-protocol' }
@@ -72,10 +72,6 @@ TXMementoSlot >> read: anObject [
 	^ self 
 		doWithTransaction: [ :transaction | | mementoValue |
 			mementoValue := memento read: anObject.
-			Transcript show: self name asString, ': '.
-			Transcript show: 'read proc: ', Processor activeProcess identityHash asString; show: ', '.
-			Transcript show: 'object: ', anObject asString; show: ', '.
-			Transcript show: 'value: ', mementoValue asString; cr.
 			(mementoValue == TXNoValue) 
 				ifTrue: [ | value |
 					value := self basicRead: anObject.
@@ -87,10 +83,6 @@ TXMementoSlot >> read: anObject [
 					value ]
 				ifFalse: [ mementoValue ] ]
 		ifNone:  [ 
-			Transcript show: self name asString, ': '.
-			Transcript show: 'read proc: ', Processor activeProcess identityHash asString; show: ', '.
-			Transcript show: 'object: ', anObject asString; show: ', '.
-			Transcript show: 'basic read'; cr.
 			self basicRead: anObject ]
 ]
 
