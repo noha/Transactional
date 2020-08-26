@@ -45,9 +45,8 @@ TXTransaction >> commit [
 					
 ]
 
-{ #category : #accessing }
+{ #category : #'as yet unclassified' }
 TXTransaction >> defaultHandler [
-	^ TXAutoCommitHandler 
 ]
 
 { #category : #enumerating }
@@ -75,15 +74,15 @@ TXTransaction >> handlersDo: aBlock [
 					on: Error 
 					do: [ :err | "ignore for now" ] ] ]
 		ifEmpty: [ 
-			self defaultHandler
-				commit: self ]
+			aBlock value: self defaultHandlerClass new ]
 		
 ]
 
 { #category : #initialization }
 TXTransaction >> initialize [ 
 	super initialize.
-	objects := OrderedCollection new
+	objects := OrderedCollection new.
+	handlers := OrderedCollection new
 ]
 
 { #category : #enumerating }
