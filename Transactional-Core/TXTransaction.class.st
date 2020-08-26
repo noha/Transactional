@@ -68,7 +68,7 @@ TXTransaction >> handlersDo: aBlock [
 			h do: [ :handler |
 				[ aBlock value: handler ]
 					on: Error 
-					do: [ :err | "ignore for now" ] ] ]
+					do: [ :err | err pass "ignore for now" ] ] ]
 		ifEmpty: [ 
 			aBlock value: self defaultHandlerClass new ]
 		

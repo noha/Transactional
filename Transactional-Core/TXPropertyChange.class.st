@@ -31,7 +31,7 @@ TXPropertyChange >> oldValue: anObject [
 
 { #category : #printing }
 TXPropertyChange >> printOn: aStream [
-	aStream << 'changed: ' << object class name << ' oldValue=' << oldValue asString << ', newValue=' << newValue asString
+	aStream << 'changed=' << property << ' object=' << object class name << ' oldValue=' << oldValue asString << ', newValue=' << newValue asString
 ]
 
 { #category : #accessing }
