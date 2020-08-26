@@ -45,6 +45,11 @@ TXTransaction >> commit [
 					
 ]
 
+{ #category : #services }
+TXTransaction >> defaultHandlerClass [
+	^ TXAutoCommitHandler 
+]
+
 { #category : #enumerating }
 TXTransaction >> do: aBlock [ 
 	TXCurrentTransaction 
