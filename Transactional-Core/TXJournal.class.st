@@ -17,8 +17,18 @@ TXJournal >> addAll: aCollection [
 	aCollection do: [ :each | self add: each ]
 ]
 
+{ #category : #accessing }
+TXJournal >> changes [ 
+	^ changes
+]
+
 { #category : #initialization }
 TXJournal >> initialize [ 
 	super initialize.
 	changes := OrderedCollection new
+]
+
+{ #category : #'as yet unclassified' }
+TXJournal >> numberOfChanges [
+	^ changes size
 ]

@@ -6,11 +6,11 @@ Class {
 
 { #category : #'as yet unclassified' }
 TXJournalBuilder >> buildJournalFor: aTransaction [
-	| journal |
-	journal := TXJournal new.
-	journal addAll: (aTransaction objects 
-		flatCollect: [ :each | self journalFor: each ]
-		as: OrderedCollection) 
+	^ TXJournal new
+		addAll: (aTransaction objects 
+			flatCollect: [ :each | self journalFor: each ]
+			as: OrderedCollection);
+		yourself
 ]
 
 { #category : #'as yet unclassified' }

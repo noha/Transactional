@@ -45,7 +45,7 @@ TXJournalTest >> testBuildJournal [
 			self assert: tx numberOfObjects equals: 1.
 			builder := TXJournalBuilder new.
 			journal := builder buildJournalFor: tx.
-			self assert: journal size equals: 3 ]
+			self assert: journal numberOfChanges equals: 3 ]
 		fail:  [:error | error pass ].
 		
 	object := aClass new.
@@ -55,7 +55,7 @@ TXJournalTest >> testBuildJournal [
 			string: 'foo';
 			dict: { #foo -> #bar } asDictionary  ].
 		
-	self assert: journal first newValue equals: 3.
-	self assert: journal second newValue equals: 'foo'.
-	self assert: journal third newValue equals: { #foo -> #bar } asDictionary.
+	self assert: journal changes first newValue equals: 3.
+	self assert: journal changes second newValue equals: 'foo'.
+	self assert: journal changes third newValue equals: { #foo -> #bar } asDictionary.
 ]
