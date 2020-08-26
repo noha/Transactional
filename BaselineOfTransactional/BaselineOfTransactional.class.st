@@ -14,7 +14,7 @@ BaselineOfTransactional >> baseline: spec [
 				spec requires: #('Transactional-Core') ].
 			
 		spec 
-			group: 'Core' with: #('ActiveGrid-Core');
-			group: 'Tests' with: #('ActiveGrid-Core-Tests' );
+			group: 'Core' with: #('Transactional-Core');
+			group: 'Tests' with: #('Transactional-Core-Tests' );
 			group: 'default' with: #('Core' 'Tests') ]
 ]
