@@ -26,7 +26,7 @@ TXJournalBuilderHandler >> builder: anObject [
 
 { #category : #accessing }
 TXJournalBuilderHandler >> commit: transaction [
-	journalBlock value: (TXJournalBuilder new 
+	journalBlock value: (self builder
 		buildJournalFor: transaction)
 ]
 
