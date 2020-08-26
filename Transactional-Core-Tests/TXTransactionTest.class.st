@@ -1,13 +1,8 @@
 Class {
 	#name : #TXTransactionTest,
-	#superclass : #SlotSilentTest,
+	#superclass : #TXTransactionalTest,
 	#category : #'Transactional-Core-Tests'
 }
-
-{ #category : #tests }
-TXTransactionTest >> compileAccessorsNamed: aSymbol [
-	self compileAccessorsFor: (aClass slotNamed: aSymbol)
-]
 
 { #category : #tests }
 TXTransactionTest >> createClass [
@@ -22,20 +17,6 @@ TXTransactionTest >> createClass [
 	self compileAccessorsNamed: #number.
 	self compileAccessorsNamed: #string.
 	self compileAccessorsNamed: #dict.
-]
-
-{ #category : #tests }
-TXTransactionTest >> forkWithTransaction: aBlock [
-	[ 
-		TXCurrentTransaction 
-			value: TXTransaction new 
-			during: aBlock ] fork
-]
-
-{ #category : #running }
-TXTransactionTest >> tearDown [ 
-	super tearDown.
-	aClass := nil
 ]
 
 { #category : #tests }

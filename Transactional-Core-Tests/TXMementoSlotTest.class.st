@@ -1,40 +1,17 @@
 Class {
 	#name : #TXMementoSlotTest,
-	#superclass : #SlotSilentTest,
+	#superclass : #TXTransactionalTest,
 	#category : #'Transactional-Core-Tests'
 }
 
 { #category : #running }
 TXMementoSlotTest >> createClass [
 	| mementoSlot |
-	Transcript show: '// create class'; cr.
 	mementoSlot := #memento2 => TXMementoSlot.
-	Transcript show: '- after slot'; cr.
 	aClass := self make: [ :builder | 
 		builder 
 			slots: { mementoSlot } ].
-	Transcript show: '\\ create class'; cr.
-]
 
-{ #category : #tests }
-TXMementoSlotTest >> forkWithTransaction: aBlock [
-	[ 
-		TXCurrentTransaction 
-			value: TXTransaction new 
-			during: aBlock ] fork
-]
-
-{ #category : #running }
-TXMementoSlotTest >> setUp [ 
-	Transcript show: '// setUp'; cr.
-	super setUp.
-	self createClass.
-	Transcript show: '\\ setUp'; cr.
-]
-
-{ #category : #running }
-TXMementoSlotTest >> tearDown [ 
-	aClass := nil.
 ]
 
 { #category : #tests }
