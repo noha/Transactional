@@ -1,6 +1,6 @@
 Class {
-	#name : #TXPluggableTransactionStrategy,
-	#superclass : #TXTransactionStrategy,
+	#name : #TXPluggableHandler,
+	#superclass : #TXTransactionHandler,
 	#instVars : [
 		'commitBlock',
 		'abortBlock'
@@ -9,7 +9,7 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-TXPluggableTransactionStrategy >> abort: transaction error: error [
+TXPluggableHandler >> abort: transaction error: error [
 	abortBlock 
 		ifNotNil: [ abortBlock value: error ]
 		ifNil: [ error pass ]
@@ -17,16 +17,16 @@ TXPluggableTransactionStrategy >> abort: transaction error: error [
 ]
 
 { #category : #accessing }
-TXPluggableTransactionStrategy >> commit: transaction [
+TXPluggableHandler >> commit: transaction [
 	commitBlock cull: transaction cull: self
 ]
 
 { #category : #enumerating }
-TXPluggableTransactionStrategy >> onAbortDo: aBlock [ 
+TXPluggableHandler >> onAbortDo: aBlock [ 
 	abortBlock := aBlock
 ]
 
 { #category : #enumerating }
-TXPluggableTransactionStrategy >> onCommitDo: aBlock [ 
+TXPluggableHandler >> onCommitDo: aBlock [ 
 	commitBlock := aBlock
 ]

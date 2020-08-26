@@ -40,7 +40,8 @@ TXJournalTest >> testBuildJournal [
 	self compileAccessorsNamed: #string.
 	self compileAccessorsNamed: #dict.
 	transaction := TXTransaction new
-		addPluggableDo:  
+		addAutoCommit;
+		onCommit:  
 		[ :tx :ctx | | builder |
 			self assert: tx numberOfObjects equals: 1.
 			builder := TXJournalBuilder new.

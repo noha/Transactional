@@ -3,7 +3,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'dirtyObjects',
-		'commitStrategy'
+		'handler'
 	],
 	#category : #'Transactional-Core'
 }
@@ -16,46 +16,36 @@ TXTransaction class >> current [
 { #category : #'as yet unclassified' }
 TXTransaction class >> pluggable [
 	^ self new 
-		commitStrategy: TXPluggableTransactionStrategy new;
+		commitStrategy: TXPluggableHandler new;
 		yourself
 ]
 
 { #category : #services }
 TXTransaction >> abort: error [
-	self commitStrategy 
+	self handler 
 		abort: self error: error
 ]
 
 { #category : #adding }
-TXTransaction >> addPluggableDo: successBlock fail: failBlock [
-	| pluggable |
-	pluggable := TXPluggableTransactionStrategy new
-		onCommitDo: successBlock;
-		onAbortDo: failBlock.
-	commitStrategy 
-		ifNotNil: [ commitStrategy last add: pluggable ]
-		ifNil: [ commitStrategy := pluggable ]
+TXTransaction >> addAutoCommit [
+	self addHandler: TXAutoCommitHandler new
+]
+
+{ #category : #adding }
+TXTransaction >> addHandler: aHandler [
+	handler 
+		ifNotNil: [ handler last add: aHandler ]
+		ifNil: [ handler := aHandler ]
 ]
 
 { #category : #accessing }
 TXTransaction >> commit [
-	^ self commitStrategy commit: self
+	^ self handler commit: self
 ]
 
 { #category : #accessing }
-TXTransaction >> commitStrategy [
-	^ commitStrategy ifNil: [ 
-		commitStrategy := self defaultCommitStrategy ]
-]
-
-{ #category : #accessing }
-TXTransaction >> commitStrategy: anObject [
-	commitStrategy := anObject
-]
-
-{ #category : #accessing }
-TXTransaction >> defaultCommitStrategy [
-	^ TXAutoCommitStrategy 
+TXTransaction >> defaultHandler [
+	^ TXAutoCommitHandler 
 ]
 
 { #category : #enumerating }
@@ -67,6 +57,12 @@ TXTransaction >> do: aBlock [
 				self commit  ]
 					on: Error do: [:error | 
 						self abort: error ] ]
+]
+
+{ #category : #accessing }
+TXTransaction >> handler [
+	^ handler ifNil: [ 
+		handler := self defaultHandler ]
 ]
 
 { #category : #initialization }
@@ -83,6 +79,13 @@ TXTransaction >> numberOfObjects [
 { #category : #accessing }
 TXTransaction >> objects [
 	^ dirtyObjects 
+]
+
+{ #category : #adding }
+TXTransaction >> onCommit: successBlock fail: failBlock [
+	self addHandler: (TXPluggableHandler new
+		onCommitDo: successBlock;
+		onAbortDo: failBlock)
 ]
 
 { #category : #accessing }

@@ -1,17 +1,17 @@
 Class {
-	#name : #TXAutoCommitStrategy,
-	#superclass : #TXTransactionStrategy,
+	#name : #TXAutoCommitHandler,
+	#superclass : #TXTransactionHandler,
 	#category : #'Transactional-Core'
 }
 
 { #category : #'as yet unclassified' }
-TXAutoCommitStrategy >> abort: transaction error: error [
+TXAutoCommitHandler >> abort: transaction error: error [
 	transaction objects do: [ :each |
 		each transactionalAbort ]
 ]
 
 { #category : #accessing }
-TXAutoCommitStrategy >> commit: transaction [
+TXAutoCommitHandler >> commit: transaction [
 	transaction objects do: [ :each |
 		each transactionalCommit ]
 ]
