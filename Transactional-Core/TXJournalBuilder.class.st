@@ -14,6 +14,15 @@ TXJournalBuilder >> buildJournalFor: aTransaction [
 ]
 
 { #category : #'as yet unclassified' }
+TXJournalBuilder >> buildJournalFrom: aTransaction [
+	| journal |
+	journal := TXJournal new.
+	journal addAll: (aTransaction objects 
+		flatCollect: [ :each | self journalFor: each ]
+		as: OrderedCollection) 
+]
+
+{ #category : #'as yet unclassified' }
 TXJournalBuilder >> journalFor: anObject [
 	| list |
 	list := OrderedCollection new.

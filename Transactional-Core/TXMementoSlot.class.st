@@ -19,7 +19,6 @@ TXMementoSlot >> basicRead: anObject [
 
 { #category : #'meta-object-protocol' }
 TXMementoSlot >> basicWrite: aValue to: anObject [
-self halt.
 	anObject 
 		instVarAt: (self instVarIndexIn: anObject)
 		put: aValue

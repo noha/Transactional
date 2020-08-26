@@ -44,7 +44,7 @@ TXJournalTest >> testBuildJournal [
 		[ :tx :ctx | | builder |
 			self assert: tx numberOfObjects equals: 1.
 			builder := TXJournalBuilder new.
-			journal := builder buildJournalFrom: tx.
+			journal := builder buildJournalFor: tx.
 			self assert: journal size equals: 3 ]
 		fail:  [:error | error pass ].
 		
