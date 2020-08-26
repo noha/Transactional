@@ -22,3 +22,13 @@ TXTransactionHandler >> last [
 	next ifNil: [ ^ self ].
 	^ next last
 ]
+
+{ #category : #accessing }
+TXTransactionHandler >> next [
+	^ next
+]
+
+{ #category : #accessing }
+TXTransactionHandler >> next: anObject [
+	next := anObject
+]

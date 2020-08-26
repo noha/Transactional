@@ -2,8 +2,8 @@ Class {
 	#name : #TXTransaction,
 	#superclass : #Object,
 	#instVars : [
-		'dirtyObjects',
-		'handler'
+		'handlers',
+		'objects'
 	],
 	#category : #'Transactional-Core'
 }
@@ -22,8 +22,9 @@ TXTransaction class >> pluggable [
 
 { #category : #services }
 TXTransaction >> abort: error [
-	self handler 
-		abort: self error: error
+	self handlersDo: [ :handler |
+		handler abort: self error: error ]
+			
 ]
 
 { #category : #adding }
@@ -33,14 +34,15 @@ TXTransaction >> addAutoCommit [
 
 { #category : #adding }
 TXTransaction >> addHandler: aHandler [
-	handler 
-		ifNotNil: [ handler last add: aHandler ]
-		ifNil: [ handler := aHandler ]
+	handlers add: aHandler
+
 ]
 
 { #category : #accessing }
 TXTransaction >> commit [
-	^ self handler commit: self
+	self handlersDo: [ :handler |
+		handler commit: self ]
+					
 ]
 
 { #category : #accessing }
@@ -60,25 +62,38 @@ TXTransaction >> do: aBlock [
 ]
 
 { #category : #accessing }
-TXTransaction >> handler [
-	^ handler ifNil: [ 
-		handler := self defaultHandler ]
+TXTransaction >> handlers [
+	^ handlers
+]
+
+{ #category : #services }
+TXTransaction >> handlersDo: aBlock [
+	handlers
+		ifNotEmpty: [ :h |
+			h do: [ :handler |
+				[ aBlock value: handler ]
+					on: Error 
+					do: [ :err | "ignore for now" ] ] ]
+		ifEmpty: [ 
+			self defaultHandler
+				commit: self ]
+		
 ]
 
 { #category : #initialization }
 TXTransaction >> initialize [ 
 	super initialize.
-	dirtyObjects := OrderedCollection new
+	objects := OrderedCollection new
 ]
 
 { #category : #enumerating }
 TXTransaction >> numberOfObjects [
-	^ dirtyObjects size
+	^ objects size
 ]
 
 { #category : #accessing }
 TXTransaction >> objects [
-	^ dirtyObjects 
+	^ objects 
 ]
 
 { #category : #adding }
@@ -90,6 +105,6 @@ TXTransaction >> onCommit: successBlock fail: failBlock [
 
 { #category : #accessing }
 TXTransaction >> register: anObject [ 
-	(dirtyObjects includes: anObject) ifFalse: [ 
-		dirtyObjects add: anObject ]
+	(objects includes: anObject) ifFalse: [ 
+		objects add: anObject ]
 ]
