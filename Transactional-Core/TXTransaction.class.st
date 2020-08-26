@@ -26,6 +26,17 @@ TXTransaction >> abort: error [
 		abort: self error: error
 ]
 
+{ #category : #adding }
+TXTransaction >> addPluggableDo: successBlock fail: failBlock [
+	| pluggable |
+	pluggable := TXPluggableTransactionStrategy new
+		onCommitDo: successBlock;
+		onAbortDo: failBlock.
+	commitStrategy 
+		ifNotNil: [ commitStrategy last add: pluggable ]
+		ifNil: [ commitStrategy := pluggable ]
+]
+
 { #category : #accessing }
 TXTransaction >> commit [
 	^ self commitStrategy commit: self
