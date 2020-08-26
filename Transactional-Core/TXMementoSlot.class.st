@@ -19,6 +19,7 @@ TXMementoSlot >> basicRead: anObject [
 
 { #category : #'meta-object-protocol' }
 TXMementoSlot >> basicWrite: aValue to: anObject [
+self halt.
 	anObject 
 		instVarAt: (self instVarIndexIn: anObject)
 		put: aValue
@@ -42,9 +43,8 @@ TXMementoSlot >> doWithTransaction: aTransactionBlock ifNone: aBlock [
 { #category : #testing }
 TXMementoSlot >> hasChanged: anObject [
 	| old new |
-	old := self read: anObject.
-	new := self basicRead: anObject.
-
+	new := self read: anObject.
+	old := self basicRead: anObject.
 	^ (new = old) not
 ]
 
@@ -95,19 +95,9 @@ TXMementoSlot >> wantsInitialization [
 TXMementoSlot >> write: aValue to: anObject [
 	self 
 		doWithTransaction: [ :transaction |
-			Transcript show: self name asString, ': '.
-			Transcript show: 'write proc: ', Processor activeProcess identityHash asString; show: ', '.
-			Transcript show: 'object: ', anObject asString; show: ', '.
-			Transcript show: 'current: ', (memento read: anObject) asString; show: ', '.
-			Transcript show: 'value: ', aValue asString; cr.
-
 			((memento read: anObject) = TXNoValue) 
 				ifTrue: [ transaction register: anObject ] .
 			memento write: aValue to: anObject ]
 		ifNone: [ 
-			Transcript show: self name asString, ': '.
-			Transcript show: 'write proc: ', Processor activeProcess identityHash asString; show: ', '.
-			Transcript show: 'object: ', anObject asString; show: ', '.
-			Transcript show: 'value: ', aValue asString; cr.
 			self basicWrite: aValue to: anObject   ]
 ]

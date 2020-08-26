@@ -17,6 +17,12 @@ TXJournalTest >> forkWithTransaction: aBlock [
 			during: aBlock ] fork
 ]
 
+{ #category : #running }
+TXJournalTest >> tearDown [ 
+	super tearDown.
+	aClass := nil
+]
+
 { #category : #tests }
 TXJournalTest >> testBuildJournal [
 	"Add instance variables using the builder interface"
@@ -33,13 +39,14 @@ TXJournalTest >> testBuildJournal [
 	self compileAccessorsNamed: #number.
 	self compileAccessorsNamed: #string.
 	self compileAccessorsNamed: #dict.
-	
-	transaction := TXPluggableTransaction new
-		onCommitDo: [ :list :tx | 
-			self assert: list size = 1.
-			journal := tx journalFor: list anyOne.
-			self assert: journal size equals: 3 ];
-		onAbortDo: [:error | error pass ].
+	transaction := TXTransaction new
+		addPluggableDo:  
+		[ :tx :ctx | | builder |
+			self assert: tx numberOfObjects equals: 1.
+			builder := TXJournalBuilder new.
+			journal := builder buildJournalFrom: tx.
+			self assert: journal size equals: 3 ]
+		fail:  [:error | error pass ].
 		
 	object := aClass new.
 	transaction do: [ 

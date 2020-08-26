@@ -2,7 +2,8 @@ Class {
 	#name : #TXTransaction,
 	#superclass : #Object,
 	#instVars : [
-		'dirtyObjects'
+		'dirtyObjects',
+		'commitStrategy'
 	],
 	#category : #'Transactional-Core'
 }
@@ -12,16 +13,38 @@ TXTransaction class >> current [
 	^ TXCurrentTransaction value
 ]
 
-{ #category : #accessing }
+{ #category : #'as yet unclassified' }
+TXTransaction class >> pluggable [
+	^ self new 
+		commitStrategy: TXPluggableTransactionStrategy new;
+		yourself
+]
+
+{ #category : #services }
 TXTransaction >> abort: error [
-	dirtyObjects do: [ :each |
-		each transactionalAbort ]
+	self commitStrategy 
+		abort: self error: error
 ]
 
 { #category : #accessing }
-TXTransaction >> commit [ 
-	dirtyObjects do: [ :each |
-		each transactionalCommit ]
+TXTransaction >> commit [
+	^ self commitStrategy commit: self
+]
+
+{ #category : #accessing }
+TXTransaction >> commitStrategy [
+	^ commitStrategy ifNil: [ 
+		commitStrategy := self defaultCommitStrategy ]
+]
+
+{ #category : #accessing }
+TXTransaction >> commitStrategy: anObject [
+	commitStrategy := anObject
+]
+
+{ #category : #accessing }
+TXTransaction >> defaultCommitStrategy [
+	^ TXAutoCommitStrategy 
 ]
 
 { #category : #enumerating }
@@ -39,6 +62,11 @@ TXTransaction >> do: aBlock [
 TXTransaction >> initialize [ 
 	super initialize.
 	dirtyObjects := OrderedCollection new
+]
+
+{ #category : #accessing }
+TXTransaction >> objects [
+	^ dirtyObjects 
 ]
 
 { #category : #accessing }
