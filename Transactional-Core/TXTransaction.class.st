@@ -45,10 +45,6 @@ TXTransaction >> commit [
 					
 ]
 
-{ #category : #'as yet unclassified' }
-TXTransaction >> defaultHandler [
-]
-
 { #category : #enumerating }
 TXTransaction >> do: aBlock [ 
 	TXCurrentTransaction 

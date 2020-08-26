@@ -80,30 +80,32 @@ TXTransactionTest >> testAutoCommitHandlerCommit [
 ]
 
 { #category : #tests }
-TXTransactionTest >> testBuildJournal [
-	"Add instance variables using the builder interface"
-	
+TXTransactionTest >> testJournalBuilderAbort [
 	| transaction object journal |
-	aClass := self make: [ :builder |
-		builder 
-			slots: {
-				#number => TXMementoSlot.
-				#string => TXMementoSlot.
-				#dict => TXMementoSlot}
-		].
-	
-	self compileAccessorsNamed: #number.
-	self compileAccessorsNamed: #string.
-	self compileAccessorsNamed: #dict.
+	self createClass.
 	transaction := TXTransaction new
-		addAutoCommit;
-		onCommit:  
-		[ :tx :ctx | | builder |
-			self assert: tx numberOfObjects equals: 1.
-			builder := TXJournalBuilder new.
-			journal := builder buildJournalFor: tx.
-			self assert: journal numberOfChanges equals: 3 ]
-		fail:  [:error | error pass ].
+		addHandler: (TXJournalBuilderHandler new
+			journalBlock: [:j | journal := j ]).
+		
+	object := aClass new.
+	transaction do: [ 
+		object 
+			number: 3;
+			string: 'foo';
+			dict: { #foo -> #bar } asDictionary.
+		Error signal  ].
+		
+	self assert: journal isNil.
+
+]
+
+{ #category : #tests }
+TXTransactionTest >> testJournalBuilderCommit [
+	| transaction object journal |
+	self createClass.
+	transaction := TXTransaction new
+		addHandler: (TXJournalBuilderHandler new
+			journalBlock: [:j | journal := j ]).
 		
 	object := aClass new.
 	transaction do: [ 
