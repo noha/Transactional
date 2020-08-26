@@ -75,6 +75,11 @@ TXTransaction >> initialize [
 	dirtyObjects := OrderedCollection new
 ]
 
+{ #category : #enumerating }
+TXTransaction >> numberOfObjects [
+	^ dirtyObjects size
+]
+
 { #category : #accessing }
 TXTransaction >> objects [
 	^ dirtyObjects 
