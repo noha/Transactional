@@ -49,7 +49,7 @@ TXMementoSlot >> hasChanged: anObject [
 
 { #category : #'meta-object-protocol' }
 TXMementoSlot >> instVarIndexIn: anObject [
-	^ anObject class instVarNames indexOf: self name
+	^ anObject class allInstVarNames indexOf: self name
 ]
 
 { #category : #'class building' }
