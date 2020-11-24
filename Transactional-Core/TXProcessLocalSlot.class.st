@@ -11,7 +11,7 @@ TXProcessLocalSlot >> initialize: anObject [
 
 { #category : #testing }
 TXProcessLocalSlot >> isVisible [ 
-	^ true
+	^ false
 ]
 
 { #category : #accessing }
