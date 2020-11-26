@@ -12,16 +12,24 @@ TXMementoSlot >> abort: anObject [
 	memento reset: anObject
 ]
 
+{ #category : #'class building' }
+TXMementoSlot >> addSlot: aSlot to: aClass [
+
+	^ aClass classInstaller update: aClass to: [ :builder | 
+		  builder
+			  fillFor: aClass;
+			  slots: (aClass classLayout slots copyWith: aSlot) ]
+]
+
 { #category : #'meta-object-protocol' }
 TXMementoSlot >> basicRead: anObject [
-	^ anObject instVarAt: (self instVarIndexIn: anObject)
+		^ super read: anObject
 ]
 
 { #category : #'meta-object-protocol' }
 TXMementoSlot >> basicWrite: aValue to: anObject [
-	anObject 
-		instVarAt: (self instVarIndexIn: anObject)
-		put: aValue
+
+	^ super write: aValue to: anObject
 ]
 
 { #category : #'as yet unclassified' }
@@ -47,11 +55,6 @@ TXMementoSlot >> hasChanged: anObject [
 	^ (new = old) not
 ]
 
-{ #category : #'meta-object-protocol' }
-TXMementoSlot >> instVarIndexIn: anObject [
-	^ anObject class allInstVarNames indexOf: self name
-]
-
 { #category : #'class building' }
 TXMementoSlot >> installingIn: aClass [
 	| slotName |
@@ -61,7 +64,7 @@ TXMementoSlot >> installingIn: aClass [
 	aClass classLayout 
 		resolveSlot: slotName   
 		ifFound:  [: slot | memento := slot ]
-		ifNone: [aClass addSlot: (memento := slotName => TXProcessLocalSlot)]
+		ifNone: [self addSlot: (memento := slotName => TXProcessLocalSlot) to: aClass]
 	
 ]
 
